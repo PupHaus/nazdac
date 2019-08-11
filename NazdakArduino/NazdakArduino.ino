@@ -18,9 +18,14 @@ bool debug = false;
 byte colorBuffer[4097];
 int colorBufferIdx = 0;
 
+bool autoOff = true;
+int autoOffTimeout = 5000;
+
 int rxTimeout = 20;
 long lastRun = 0;
+long lastDraw = 0;
 bool lastActionWrite = false;
+bool lastActionBlank = false;
 
 
 void setup() {
@@ -34,23 +39,37 @@ void setup() {
 }
 
 void loop() {
-  //if (lastRun > millis()) {
-    //lastRun = millis();
-  //}
+  // if millis overflows reset
+  if (lastRun > millis()) {lastRun = millis();}
+  if (lastDraw > millis()) {lastDraw = millis();}
   
   if (Serial.available() > 0) {
+    lastActionWrite = false;
+    lastActionBlank = false;
     lastRun = millis();
+    
     byte inByte = (byte)Serial.read();
     colorBuffer[colorBufferIdx++] = inByte;
-    
-    lastActionWrite = false;
   }
   else if (lastActionWrite == false) {
     Serial.println("no serial data avail");
     if ( lastRun + rxTimeout < millis() ) {
-      ProcessBuffer();
       lastActionWrite = true;
+      lastDraw = millis();
+      
+      ProcessBuffer();
     }
+  }
+  else if (lastActionBlank == false && autoOff) {
+    if ( lastDraw + autoOffTimeout < millis() ) {
+      lastActionBlank = true;
+      
+      for (int i = 0; i <= 4098; i++) {
+        colorBuffer[i] = 0;
+      }
+      ProcessBuffer();
+    }
+    
   }
 }
 
