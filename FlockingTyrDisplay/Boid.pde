@@ -30,8 +30,8 @@ class Boid {
     r = 1.0;
     maxspeed = 2;
     maxforce = 0.03;
-    colorMode(HSV, 100);
-    c = color(random(100));
+    colorMode(HSB, 100);
+    c = color(random(100), 100, 100);
     colorMode(RGB, 255);
   }
 
