@@ -27,11 +27,8 @@ long lastDraw = 0;
 bool lastActionWrite = false;
 bool lastActionBlank = false;
 
-
 void setup() {
   Serial.begin(2000000);
-  
-  Serial.println("Starting");
   
   Matrix.begin();
   //Matrix.setRotation(0);
@@ -52,7 +49,6 @@ void loop() {
     colorBuffer[colorBufferIdx++] = inByte;
   }
   else if (lastActionWrite == false) {
-    Serial.println("no serial data avail");
     if ( lastRun + rxTimeout < millis() ) {
       lastActionWrite = true;
       lastDraw = millis();
@@ -74,7 +70,6 @@ void loop() {
 }
 
 void ProcessBuffer() {
-  Serial.println("Processing Buffer");
   for (int i = 0; i <= 2048; i++) {
     int idx = i * 2;
 
@@ -89,5 +84,4 @@ void ProcessBuffer() {
 
   }
   colorBufferIdx = 0;
-  Serial.println("Buffer Done");
 }
